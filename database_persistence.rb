@@ -25,23 +25,20 @@ class DatabasePersistence
 =end
 
   def all_lists
-    lists_sql = <<~SQL
-      SELECT lists.*,
-        COUNT(todos.id) AS todos_count,
-        COUNT(NULLIF(todos.completed, true)) AS todos_remaining_count
-        FROM lists
-        LEFT JOIN todos ON lists.id = todos.list_id
-        GROUP BY lists.id
-        ORDER BY lists.name;
+    lists_sql =
+    <<~SQL
+    SELECT lists.*,
+      COUNT(todos.id) AS todos_count,
+      COUNT(NULLIF(todos.completed, true)) AS todos_remaining_count
+      FROM lists
+      LEFT JOIN todos ON lists.id = todos.list_id
+      GROUP BY lists.id
+      ORDER BY lists.name;
     SQL
     list_result = query(lists_sql)
 
     list_result.map do |tuple|
-      { id: tuple["id"].to_i,
-        name: tuple["name"],
-        todos_count: tuple["todos_count"].to_i,
-        todos_remaining_count: tuple["todos_remaining_count"].to_i
-      }
+      tuple_to_list_hash(tuple)
     end
   end
 
@@ -56,14 +53,29 @@ class DatabasePersistence
 =end
 
   def find_list(id)
-    list_sql = "SELECT * FROM lists WHERE id = $1;"
+    list_sql =
+    <<~SQL
+    SELECT lists.*,
+        COUNT(todos.id) AS todos_count,
+        COUNT(NULLIF(todos.completed, true)) AS todos_remaining_count
+        FROM lists
+        LEFT JOIN todos ON lists.id = todos.list_id
+        WHERE lists.id = $1
+        GROUP BY lists.id
+        ORDER BY lists.name;
+    SQL
     list_result = query(list_sql, id)
+    tuple = list_result.first
+    tuple_to_list_hash(tuple)
+  end
 
-    list_result.map do |list_tuple|
-      list_id = list_tuple["id"].to_i
-      todos = find_todo_for_list(list_id)
-      { id: list_tuple["id"].to_i, name: list_tuple["name"], todos: todos }
-    end.first
+  def tuple_to_list_hash(tuple)
+    {
+      id: tuple["id"].to_i,
+      name: tuple["name"],
+      todos_count: tuple["todos_count"].to_i,
+      todos_remaining_count: tuple["todos_remaining_count"].to_i
+    }
   end
 
   def to_boolean(str)
@@ -105,8 +117,6 @@ class DatabasePersistence
     query(sql, list_id)
   end
 
-  private
-
 =begin find_todo_for_list
   - traverse PG::result object (ARRAY OF HASHES)
     - create a PG::result object containing all `todos` whose `list_id` matches the `id` of the current value of block argument `list_tuple`, store in `todos_result`
@@ -126,6 +136,8 @@ class DatabasePersistence
         completed: to_boolean(todo_tuple["completed"]) }
     end
   end
+
+  private
 
   def query(statement, *params)
     @logger.info("#{statement} #{params}")
