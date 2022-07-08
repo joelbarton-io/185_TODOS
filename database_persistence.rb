@@ -11,6 +11,10 @@ class DatabasePersistence
     end
   end
 
+  def disconnect
+    @db.close
+  end
+
 =begin all_lists
   - create sql to fetch all tuples from `lists` table
   - execute query; -> PG::result object
