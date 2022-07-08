@@ -3,8 +3,12 @@ require "pry"
 
 class DatabasePersistence
   def initialize(logger)
-    @db = PG.connect(dbname: "todos")
     @logger = logger
+    @db = if Sinatra::Base.production?
+      PG.connect(ENV['DATABASE_URL'])
+    else
+      PG.connect(dbname: "todos")
+    end
   end
 
 =begin all_lists
@@ -109,7 +113,6 @@ class DatabasePersistence
         completed: to_boolean(todo_tuple["completed"]) }
     end
   end
-
 
   def query(statement, *params)
     @logger.info("#{statement} #{params}")

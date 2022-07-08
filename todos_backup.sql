@@ -55,10 +55,10 @@ ALTER SEQUENCE public.lists_id_seq OWNED BY public.lists.id;
 
 
 --
--- Name: todo; Type: TABLE; Schema: public; Owner: joelbarton
+-- Name: todos; Type: TABLE; Schema: public; Owner: joelbarton
 --
 
-CREATE TABLE public.todo (
+CREATE TABLE public.todos (
     id integer NOT NULL,
     name character varying(255) NOT NULL,
     completed boolean DEFAULT false NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE public.todo (
 );
 
 
-ALTER TABLE public.todo OWNER TO joelbarton;
+ALTER TABLE public.todos OWNER TO joelbarton;
 
 --
 -- Name: todo_id_seq; Type: SEQUENCE; Schema: public; Owner: joelbarton
@@ -87,7 +87,7 @@ ALTER TABLE public.todo_id_seq OWNER TO joelbarton;
 -- Name: todo_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: joelbarton
 --
 
-ALTER SEQUENCE public.todo_id_seq OWNED BY public.todo.id;
+ALTER SEQUENCE public.todo_id_seq OWNED BY public.todos.id;
 
 
 --
@@ -98,10 +98,10 @@ ALTER TABLE ONLY public.lists ALTER COLUMN id SET DEFAULT nextval('public.lists_
 
 
 --
--- Name: todo id; Type: DEFAULT; Schema: public; Owner: joelbarton
+-- Name: todos id; Type: DEFAULT; Schema: public; Owner: joelbarton
 --
 
-ALTER TABLE ONLY public.todo ALTER COLUMN id SET DEFAULT nextval('public.todo_id_seq'::regclass);
+ALTER TABLE ONLY public.todos ALTER COLUMN id SET DEFAULT nextval('public.todo_id_seq'::regclass);
 
 
 --
@@ -109,14 +109,26 @@ ALTER TABLE ONLY public.todo ALTER COLUMN id SET DEFAULT nextval('public.todo_id
 --
 
 COPY public.lists (id, name) FROM stdin;
+1	Homework
+2	Groceries
+3	TEST TEST
 \.
 
 
 --
--- Data for Name: todo; Type: TABLE DATA; Schema: public; Owner: joelbarton
+-- Data for Name: todos; Type: TABLE DATA; Schema: public; Owner: joelbarton
 --
 
-COPY public.todo (id, name, completed, list_id) FROM stdin;
+COPY public.todos (id, name, completed, list_id) FROM stdin;
+2	carrots	f	2
+6	Fear of being loved	f	3
+7	Allegiance to the pain	f	3
+8	Give anything to change	f	3
+9	I fucked up; I'm missing you	f	3
+1	Science	f	1
+5	cs	f	1
+3	spinach	t	2
+4	cheese	t	2
 \.
 
 
@@ -124,14 +136,14 @@ COPY public.todo (id, name, completed, list_id) FROM stdin;
 -- Name: lists_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joelbarton
 --
 
-SELECT pg_catalog.setval('public.lists_id_seq', 1, false);
+SELECT pg_catalog.setval('public.lists_id_seq', 4, true);
 
 
 --
 -- Name: todo_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joelbarton
 --
 
-SELECT pg_catalog.setval('public.todo_id_seq', 1, false);
+SELECT pg_catalog.setval('public.todo_id_seq', 10, true);
 
 
 --
@@ -151,19 +163,19 @@ ALTER TABLE ONLY public.lists
 
 
 --
--- Name: todo todo_pkey; Type: CONSTRAINT; Schema: public; Owner: joelbarton
+-- Name: todos todo_pkey; Type: CONSTRAINT; Schema: public; Owner: joelbarton
 --
 
-ALTER TABLE ONLY public.todo
+ALTER TABLE ONLY public.todos
     ADD CONSTRAINT todo_pkey PRIMARY KEY (id);
 
 
 --
--- Name: todo todo_list_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: joelbarton
+-- Name: todos todos_list_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: joelbarton
 --
 
-ALTER TABLE ONLY public.todo
-    ADD CONSTRAINT todo_list_id_fkey FOREIGN KEY (list_id) REFERENCES public.lists(id);
+ALTER TABLE ONLY public.todos
+    ADD CONSTRAINT todos_list_id_fkey FOREIGN KEY (list_id) REFERENCES public.lists(id) ON DELETE CASCADE;
 
 
 --
