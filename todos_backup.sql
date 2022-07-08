@@ -109,9 +109,6 @@ ALTER TABLE ONLY public.todos ALTER COLUMN id SET DEFAULT nextval('public.todo_i
 --
 
 COPY public.lists (id, name) FROM stdin;
-1	Homework
-2	Groceries
-3	TEST TEST
 \.
 
 
@@ -120,15 +117,6 @@ COPY public.lists (id, name) FROM stdin;
 --
 
 COPY public.todos (id, name, completed, list_id) FROM stdin;
-2	carrots	f	2
-6	Fear of being loved	f	3
-7	Allegiance to the pain	f	3
-8	Give anything to change	f	3
-9	I fucked up; I'm missing you	f	3
-1	Science	f	1
-5	cs	f	1
-3	spinach	t	2
-4	cheese	t	2
 \.
 
 
